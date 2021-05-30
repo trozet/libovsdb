@@ -14,6 +14,10 @@ https://github.com/socketplane/libovsdb/
 This fork has been created to encourage changes and patches to ensure this
 version of the library works with [go-ovn](https://github.com/eBay/go-ovn).
 
+**UPDATE**
+
+This fork is not actively updated any more because the original libovsdb has revived and upstreamed to https://github.com/ovn-org/libovsdb, and all the patches from this fork have been merged back to the upstream.
+
 ## What is OVSDB?
 
 OVSDB is the Open vSwitch Database Protocol.
