@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/url"
 	"reflect"
@@ -89,11 +90,17 @@ func Connect(endpoints string, tlsConfig *tls.Config) (*OvsdbClient, error) {
 	return nil, fmt.Errorf("failed to connect to endpoints %q: %v", endpoints, err)
 }
 
+func handleMonitorCancel(client *rpc2.Client, params []interface{}, reply *interface{}) error {
+	log.Println("monitor cancel received")
+	return client.Close()
+}
+
 func newRPC2Client(conn net.Conn) (*OvsdbClient, error) {
 	c := rpc2.NewClientWithCodec(jsonrpc.NewJSONCodec(conn))
 	c.SetBlocking(true)
 	c.Handle("echo", echo)
 	c.Handle("update", update)
+	c.Handle("monitor_cancel", handleMonitorCancel)
 	go c.Run()
 	go handleDisconnectNotification(c)
 
