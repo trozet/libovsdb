@@ -2,6 +2,29 @@ package libovsdb
 
 import "encoding/json"
 
+const (
+	// OperationInsert is an insert operation
+	OperationInsert = "insert"
+	// OperationSelect is a select operation
+	OperationSelect = "select"
+	// OperationUpdate is an update operation
+	OperationUpdate = "update"
+	// OperationMutate is a mutate operation
+	OperationMutate = "mutate"
+	// OperationDelete is a delete operation
+	OperationDelete = "delete"
+	// OperationWait is a wait operation
+	OperationWait = "wait"
+	// OperationCommit is a commit operation
+	OperationCommit = "commit"
+	// OperationAbort is an abort operation
+	OperationAbort = "abort"
+	// OperationComment is a comment operation
+	OperationComment = "comment"
+	// OperationAssert is an assert operation
+	OperationAssert = "assert"
+)
+
 // Operation represents an operation according to RFC7047 section 5.2
 type Operation struct {
 	Op        string                   `json:"op"`
@@ -83,6 +106,29 @@ type TableUpdate struct {
 type RowUpdate struct {
 	New Row `json:"new,omitempty"`
 	Old Row `json:"old,omitempty"`
+}
+
+// TableUpdates2 is a collection of TableUpdate2 entries
+// We cannot use TableUpdates2 directly by json encoding by inlining the TableUpdate2 Map
+// structure till GoLang issue #6213 makes it.
+// The only option is to go with raw map[string]map[string]interface{} option :-( that sucks !
+// Refer to client.go : MonitorAll() function for more details
+type TableUpdates2 struct {
+	Updates map[string]TableUpdate2 `json:"updates,overflow"`
+}
+
+// TableUpdate2 represents a table update according to RFC7047
+type TableUpdate2 struct {
+	Rows map[string]RowUpdate2 `json:"rows,overflow"`
+}
+
+// RowUpdate2 represents a row update according to RFC7047
+type RowUpdate2 struct {
+	UUID    UUID `json:"-,omitempty"`
+	Initial Row  `json:"initial,omitempty"`
+	Insert  Row  `json:"insert,omitempty"`
+	Modify  Row  `json:"modify,omitempty"`
+	Delete  Row  `json:"delete,omitempty"`
 }
 
 // OvsdbError is an OVS Error Condition
