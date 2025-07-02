@@ -1,3 +1,4 @@
+// Deprecated: use github.com/ovn-kubernetes/libovsdb instead.
 module github.com/ovn-org/libovsdb
 
 go 1.18

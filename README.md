@@ -5,6 +5,10 @@ libovsdb
 
 An OVSDB Library written in Go
 
+> [!CAUTION]
+> This library has been moved to <https://github.com/ovn-kubernetes/libovsdb>.
+> Please update your imports to use the new location.
+
 ## What is OVSDB?
 
 OVSDB is the Open vSwitch Database Protocol.
