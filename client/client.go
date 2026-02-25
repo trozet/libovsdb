@@ -1459,22 +1459,46 @@ func (o *ovsdbClient) List(ctx context.Context, result interface{}) error {
 	return primaryDB.api.List(ctx, result)
 }
 
+type consistentConditionalAPI struct {
+	client *ovsdbClient
+	ConditionalAPI
+}
+
+func (c consistentConditionalAPI) List(ctx context.Context, result interface{}) error {
+	primaryDB := c.client.primaryDB()
+	waitForCacheConsistent(ctx, primaryDB, c.client.logger, c.client.primaryDBName)
+	defer primaryDB.cacheMutex.RUnlock()
+	return c.ConditionalAPI.List(ctx, result)
+}
+
 // Where implements the API interface's Where function
 func (o *ovsdbClient) Where(models ...model.Model) ConditionalAPI {
-	return o.primaryDB().api.Where(models...)
+	return consistentConditionalAPI{
+		client:         o,
+		ConditionalAPI: o.primaryDB().api.Where(models...),
+	}
 }
 
 // WhereAny implements the API interface's WhereAny function
 func (o *ovsdbClient) WhereAny(m model.Model, conditions ...model.Condition) ConditionalAPI {
-	return o.primaryDB().api.WhereAny(m, conditions...)
+	return consistentConditionalAPI{
+		client:         o,
+		ConditionalAPI: o.primaryDB().api.WhereAny(m, conditions...),
+	}
 }
 
 // WhereAll implements the API interface's WhereAll function
 func (o *ovsdbClient) WhereAll(m model.Model, conditions ...model.Condition) ConditionalAPI {
-	return o.primaryDB().api.WhereAll(m, conditions...)
+	return consistentConditionalAPI{
+		client:         o,
+		ConditionalAPI: o.primaryDB().api.WhereAll(m, conditions...),
+	}
 }
 
 // WhereCache implements the API interface's WhereCache function
 func (o *ovsdbClient) WhereCache(predicate interface{}) ConditionalAPI {
-	return o.primaryDB().api.WhereCache(predicate)
+	return consistentConditionalAPI{
+		client:         o,
+		ConditionalAPI: o.primaryDB().api.WhereCache(predicate),
+	}
 }
